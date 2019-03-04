@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">蹭课吧</string>
+    <string name="intro_1">sui便试一试！</string>
+
+    <string name="time_1">08:00\n\n\n08:45</string>
+    <string name="time_2">08:50\n\n\n09:35</string>
+    <string name="time_3">09:50\n\n\n10:35</string>
+    <string name="time_4">10:40\n\n\n11:25</string>
+    <string name="time_5">11:30\n\n\n12:35</string>
+    <string name="time_6">14:05\n\n\n14:50</string>
+    <string name="time_7">14:55\n\n\n15:40</string>
+    <string name="time_8">15:45\n\n\n16:30</string>
+    <string name="time_9">16:40\n\n\n17:25</string>
+    <string name="time_10">17:30\n\n\n18:25</string>
+    <string name="time_11">18:30\n\n\n19:15</string>
+    <string name="time_12">19:20\n\n\n20:05</string>
+    <string name="time_13">20:10\n\n\n20:55</string>
+
+    <string name="base_url">http://47.106.107.107</string>
+</resources>

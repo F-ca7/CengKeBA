@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/btn_add_course"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="15dp"
+        android:text="添加课程"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <!--背景图-->
+            <ImageView
+                android:id="@+id/bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/user_bg" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <!--Toolbar-->
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:background="#33ab96c5"
+                    app:popupTheme="@style/AlertDialog.AppCompat.Light"
+                    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+                <!--星期条-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:background="#33ab96c5">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+
+                        android:text="时间" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="周一" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="周二" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="周三" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="周四" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="周五" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="周六" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="周日" />
+                </LinearLayout>
+
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="0dp"
+                    android:orientation="horizontal">
+                        <LinearLayout
+                            android:id="@+id/course_time"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+
+                                android:gravity="right"
+                                android:text="@string/time_1"
+                                android:textSize="12dp" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#aa000000" />
+
+
+                                <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+
+                                android:text="@string/time_2"
+                                android:textSize="12dp"
+                                android:gravity="right"/>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#aa000000" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+
+                                android:text="@string/time_3"
+                                android:textSize="12dp"
+                                android:gravity="right"/>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#aa000000" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+
+                                android:text="@string/time_4"
+                                android:textSize="12dp"
+                                android:gravity="right"/>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#aa000000" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+
+                                android:text="@string/time_5"
+                                android:textSize="12dp"
+                                android:gravity="right"/>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#aa000000" />
+
+                                <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+
+                                android:text="@string/time_6"
+                                android:textSize="12dp"
+                                android:gravity="right"/>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#aa000000" />
+                                <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+
+                                android:text="@string/time_7"
+                                android:textSize="12dp"
+                                android:gravity="right"/>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#aa000000" />
+                                <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+
+                                android:text="@string/time_8"
+                                android:textSize="12dp"
+                                android:gravity="right"/>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#aa000000" />
+                                <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+
+                                android:text="@string/time_9"
+                                android:textSize="12dp"
+                                android:gravity="right"/>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#aa000000" />
+                                <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+
+                                android:text="@string/time_10"
+                                android:textSize="12dp"
+                                android:gravity="right"/>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#aa000000" />
+                                <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+
+                                android:text="@string/time_10"
+                                android:textSize="12dp"
+                                android:gravity="right"/>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#aa000000" />
+                                <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+
+                                android:text="@string/time_11"
+                                android:textSize="12dp"
+                                android:gravity="right"/>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#aa000000" />
+                                <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+
+                                android:text="@string/time_12"
+                                android:textSize="12dp"
+                                android:gravity="right"/>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#aa000000" />
+                                <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+
+                                android:text="@string/time_13"
+                                android:textSize="12dp"
+                                android:gravity="right"/>
+
+
+
+
+
+
+
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/mon_panel"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/tues_panel"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/wed_panel"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/thur_panel"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/fri_panel"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/sat_panel"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/sun_panel"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+
+                        </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </ScrollView>
+
+
+
+
+</android.support.constraint.ConstraintLayout>
