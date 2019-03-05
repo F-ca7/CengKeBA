@@ -320,7 +320,7 @@ public class MainInterActivity extends AppCompatActivity {
                         lastX = (int) event.getRawX();
                         lastY = (int) event.getRawY();
                         break;
-                    /*todo 设置靠边停靠*/
+
                     case MotionEvent.ACTION_UP: // 弹起事件
                         //判断是单击事件或是拖动事件，位移量大于5则断定为拖动事件
                         if (Math.abs((int) (event.getRawX() - downX)) > 5
