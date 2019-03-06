@@ -17,8 +17,21 @@
         <item name="android:textColorPrimary">#00ff00</item>
     </style>
 
-    <style name="TransparentDialog" parent="@android:style/Theme.Holo.Light.Dialog">
-        <item name="android:windowBackground">@android:color/transparent</item>
-    </style>
+    <!--<style name="mytoast">-->
+        <!--<item name="stTextBold">true</item>-->
+        <!--<item name="stTextColor">#fff</item>-->
+        <!--<item name="stTextSize">14sp</item>-->
+        <!--<item name="stColorBackground">#a1c4fd</item>-->
+        <!--<item name="stSolidBackground">true</item>-->
+        <!--<item name="stStrokeWidth">3dp</item>-->
+        <!--<item name="stStrokeColor">#c2e9fb</item>-->
+        <!--&lt;!&ndash;<item name="stIconStart">@drawable/ic</item>&ndash;&gt;-->
+        <!--&lt;!&ndash;<item name="stIconEnd">@drawable/ic</item>&ndash;&gt;-->
+        <!--<item name="stLength">LONG</item>-->
+        <!--<item name="stGravity">top</item>-->
+        <!--<item name="stRadius">5dp</item>-->
+    <!--</style>-->
+
+
 
 </resources>

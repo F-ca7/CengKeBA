@@ -77,7 +77,24 @@
     </LinearLayout>
     <RelativeLayout
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+        <com.github.ybq.android.spinkit.SpinKitView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/spin_loading"
+            style="@style/SpinKitView.Large.Circle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:SpinKit_Color="#a1c4fd"
+            android:visibility="gone"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+
 
         <ImageButton
             android:id="@+id/user_center"

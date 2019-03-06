@@ -14,6 +14,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
+
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -28,6 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -68,6 +70,8 @@ import permissions.dispatcher.PermissionRequest;
 import permissions.dispatcher.RuntimePermissions;
 
 import com.example.fang.utils.AppUtils;
+import com.github.ybq.android.spinkit.style.Circle;
+import com.github.ybq.android.spinkit.style.DoubleBounce;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import static com.example.fang.utils.AppUtils.toastDebug;
@@ -84,8 +88,9 @@ public class MainInterActivity extends AppCompatActivity {
     private EditText search_edit_text;
     private LinearLayout llBuildingCourseList;
     private ListView lvBuildingCourseList;
-    private boolean isShowingCourse = false;    //是否正在显示教学楼内课程列表
+    ProgressBar progressBar;
 
+    private boolean isShowingCourse = false;    //是否正在显示教学楼内课程列表
 
     private boolean clickormove = true;     //点击或拖动，点击为true，拖动为false
     private int downX, downY;               //按下时的X，Y坐标
@@ -173,6 +178,9 @@ public class MainInterActivity extends AppCompatActivity {
         }
         setMap();
 
+        //设置加载动画
+        progressBar = findViewById(R.id.spin_loading);
+        progressBar.setIndeterminateDrawable(new Circle());
         userCenterBtn = findViewById(R.id.user_center);
         setFloatingButton();
 
@@ -425,16 +433,10 @@ public class MainInterActivity extends AppCompatActivity {
     private void initMapData() {
         locationClient.start();//开始定位
         baiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);//设置为一般地图
-        //baiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);//设置为卫星地图
         baiduMap.setTrafficEnabled(false);//开启交通图
 
         CoordinateConverter converter  = new CoordinateConverter();
         converter.from(CoordinateConverter.CoordType.COMMON);
-        // sourceLatLng待转换坐标
-//        converter.coord(testLatLng);
-//        LatLng desLatLng = converter.convert();
-//        BitmapDescriptor bitmap = BitmapDescriptorFactory.fromResource(R.drawable.kn_test);
-//        addMarker(desLatLng,bitmap,"测试marker");
 
         ll_building_map.put(GREEN_HOUSE_1_LL,new Building("3","1", getApplication()));
         ll_building_map.put(GREEN_HOUSE_2_LL,new Building("3","2", getApplication()));
@@ -452,6 +454,7 @@ public class MainInterActivity extends AppCompatActivity {
             @Override
             public boolean onMarkerClick(Marker marker) {
             if(!isShowingCourse) {
+                progressBar.setVisibility(View.VISIBLE);
                 String buildingName = marker.getTitle();
                 LatLng buildingLL = marker.getPosition();
                 /*Toast.makeText(getApplicationContext(),
@@ -472,8 +475,6 @@ public class MainInterActivity extends AppCompatActivity {
                         }
                     }
                 }).start();
-
-
             }else {
                 hideCourseList();
                 showCourseList();
@@ -485,6 +486,12 @@ public class MainInterActivity extends AppCompatActivity {
 
 
     private void showCourseList() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setVisibility(View.GONE);
+            }
+        });
         CourseAdapter courseAdapter = new CourseAdapter(MainInterActivity.this,R.layout.item_course,courseList);
         lvBuildingCourseList.setAdapter(courseAdapter);
         //当指向另一个ArrayList时，就不能这样做
@@ -498,7 +505,7 @@ public class MainInterActivity extends AppCompatActivity {
                 llBuildingCourseList.setVisibility(View.VISIBLE);
                 llBuildingCourseList.startAnimation(ctrlAnimation);
             }
-        }, 600);
+        }, 200);
     }
 
     private void hideCourseList() {

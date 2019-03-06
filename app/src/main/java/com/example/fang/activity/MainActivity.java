@@ -8,12 +8,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -21,7 +24,16 @@ import android.widget.Toast;
 
 import com.example.fang.model.ActivatedUser;
 import com.example.fang.model.Captcha;
+import com.example.fang.model.LoginInfo;
+import com.example.fang.model.LoginStatusEnum;
+import com.example.fang.utils.MyJSONParser;
+import com.example.fang.utils.SecuritySharedPreference;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
+import com.github.johnpersano.supertoasts.library.SuperToast;
+import com.github.johnpersano.supertoasts.library.utils.PaletteUtils;
 import com.google.gson.Gson;
+//import com.muddzdev.styleabletoast.StyleableToast;
 
 
 import net.sf.json.*;
@@ -52,9 +64,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText tvYzm;
     private ImageView about;
     private ImageView ivCaptcha;
+    private CheckBox ckbRememberPwd;
     private String mainUrl;
     private LinearLayout llYzm;
     private boolean isActivating = false;
+
+    private SecuritySharedPreference ssp;
+
+    public Handler loginHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message message) {
+            LoginInfo info = (LoginInfo)message.obj;
+            LoginStatusEnum status = info.getStatus();
+
+
+            switch (status){
+                case SUCCESS:
+                    Toast.makeText(MainActivity.this,"welcome "+info.getName(), Toast.LENGTH_SHORT).show();
+                    MainActivity.this.showMainInter();
+                    break;
+                case WRONG_PWD:
+                case UNKNOWN:
+                    Toast.makeText(MainActivity.this,"用户密码错误", Toast.LENGTH_SHORT).show();
+                    resetPwdEdt();
+                    break;
+                case NOT_ACTIVATED:
+                    Toast.makeText(MainActivity.this,"用户尚未激活 ", Toast.LENGTH_SHORT).show();
+                    resetPwdEdt();
+                    showActivation();
+                    break;
+            }
+            return false;
+        }
+    });
 
     private void showDial(String title, String message){
         final AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
@@ -74,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //   保存当前activity的状态信息
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         okHttpClient = new OkHttpClient();
         initView();
 
@@ -107,15 +148,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         about = findViewById(R.id.about);           //关于按钮
         ivCaptcha = findViewById(R.id.captcha);    //验证码图片
         llYzm = findViewById(R.id.ll_yzm);
-
+        ckbRememberPwd = findViewById(R.id.ckb_remember_pwd);   //记住密码
         //获取登录所需信息
         //getAccountYzm();
 
         btnLogin.setOnClickListener(this);
         about.setOnClickListener(this);
         ivCaptcha.setOnClickListener(this);
-
+        ssp = new SecuritySharedPreference(getApplicationContext(), "settings", MODE_PRIVATE);
         loadOldData();
+        getAccountYzm();
     }
 
     private void loadOldData() {
@@ -124,6 +166,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(!id.equals("")){
             etUsername.setText(id);
             etPassword.requestFocus();
+        }
+        if(ssp != null){
+            //获取信息
+            boolean isRemembered = ssp.getBoolean("is_save_pwd",false);
+            if(isRemembered){
+                String pwd = ssp.getString("password","");
+                etPassword.setText(pwd);
+                etPassword.setSelection(pwd.length());
+                ckbRememberPwd.setChecked(true);
+            }
         }
     }
 
@@ -176,8 +228,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //登录用户
-    private void loginAccount(final String userID, String password) {
-        final String loginUrl =mainUrl + "/account/login/";
+    private void loginAccount(final String userID, final String password) {
+        final String loginUrl = mainUrl + "/account/login/";
         final EditText edPwd = findViewById(R.id.password);
 
         RequestBody requestBody = new FormBody.Builder()
@@ -191,74 +243,97 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onFailure(Call call, IOException e) {
                 Log.i("Fail","Cannot get from "+ loginUrl);
             }
-
-            /*{
-                "is_activated": true,
-                "term": "2018-2019学年下学期",
-                "real_name": "周健恒",
-                "grade": 2017,
-                "token": "854ac057180bf9906304f310606e44ff19e72155",
-                "school": "计算机学院"
-            }*/
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String loginInfo = response.body().string();
-                Log.i("FROM /account/login ",loginInfo);
-                try {
-                    JSONObject job = JSONObject.fromObject(loginInfo);
-                    if(job.has("is_activated")){
-                        String activateStatus = job.getString("is_activated");
-                        String name;
-                        String token;
-                        Log.i("登录: ", activateStatus);
-                        if(activateStatus.equals("true")){
-                            Log.i("登录: ", "成功");
-                            name = job.getString("real_name");
-                            token = job.getString("token");
-                            SharedPreferences userInfo = getSharedPreferences("userInfo",MODE_PRIVATE);
-                            SharedPreferences.Editor editor = userInfo.edit();
-                            editor.putString("real_name", name);
-                            editor.putString("stu_ID", userID);
-                            editor.putString("token", token);
-                            editor.apply();
-                            Log.i("FROM /account/login ","Login success!");
-                            Looper.prepare();
-                            Toast.makeText(MainActivity.this,"welcome "+name, Toast.LENGTH_SHORT).show();
-                            MainActivity.this.showMainInter();
-                            Looper.loop();
-                        }
-                    } else {
-                        Log.i("登录: ", "失败");
-                        Looper.prepare();
-                        if(job.has("is_pwd_correct")){
-                            String passCorrect = job.getString("is_pwd_correct");
-                            if(passCorrect.equals("false")){
-                                Toast.makeText(MainActivity.this,"用户密码错误", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Toast.makeText(MainActivity.this,"用户尚未激活", Toast.LENGTH_SHORT).show();
-                            edPwd.setText("");
-                            showActivation();
-                        }
-                        Looper.loop();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                String loginResult = response.body().string();
+                Log.i("FROM /account/login ", loginResult);
+                processLoginResult(loginResult, userID, password);
 
             }
         });
     }
 
+    private void processLoginResult(String loginResult, String userID, String password) {
+        try {
+            JSONObject job = JSONObject.fromObject(loginResult);
+            LoginStatusEnum code = MyJSONParser.parseLoginStatus(loginResult);
+            LoginInfo info = null;
+            switch (code){
+                case SUCCESS:
+                    String name = job.getString("real_name");
+                    String token = job.getString("token");
+                    info = new LoginInfo(name, userID, token, code);
+                    if(ckbRememberPwd.isChecked()){
+                        storeLoginInfo(info, password);
+                    }else {
+                        clearRemember();
+                    }
+
+                    break;
+                case WRONG_PWD:
+                case UNKNOWN:
+                    info = new LoginInfo(code);
+                    break;
+                case NOT_ACTIVATED:
+                    info = new LoginInfo(code);
+                    break;
+            }
+            Message message = new Message();
+            message.obj = info;
+            loginHandler.sendMessage(message);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void storeLoginInfo(LoginInfo info, String password) {
+        SharedPreferences userInfo = getSharedPreferences("userInfo",MODE_PRIVATE);
+        SharedPreferences.Editor editor = userInfo.edit();
+        editor.putString("real_name", info.getName());
+        editor.putString("stu_ID", info.getId());
+        editor.putString("token", info.getToken());
+        editor.apply();
+        if(ckbRememberPwd.isChecked()){
+            rememberPwd(password);
+        }else {
+            clearRemember();
+        }
+    }
+
+    private void resetPwdEdt() {
+        etPassword.setText("");
+    }
+
+
+
+    private void clearRemember() {
+        SecuritySharedPreference.Editor editor = ssp.edit();
+        editor.putString("password", "");
+        editor.putBoolean("is_save_pwd",false);
+        editor.apply();
+    }
+
+    private void rememberPwd(String pwd) {
+        SecuritySharedPreference ssp = new SecuritySharedPreference(getApplicationContext(), "settings",MODE_PRIVATE);
+        SecuritySharedPreference.Editor editor = ssp.edit();
+        editor.putString("password", pwd);
+        editor.putBoolean("is_save_pwd",true);
+        editor.apply();
+    }
+
     private void showActivation() {
         llYzm.setVisibility(View.VISIBLE);
+        ivCaptcha.setVisibility(View.VISIBLE);
         btnLogin.setText("激   活");
         isActivating = true;
+        getAccountYzm();
     }
 
 
     //获取登录cookie并设置登录图片
     private void getAccountYzm(){
+        if(!isActivating)
+            return;
         String dir = "/account/yzm/";
         //将域名与虚拟目录拼接起来
         final String request_url = mainUrl+dir;
@@ -276,22 +351,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 try {
                     if(response.isSuccessful()){
                         String info = response.body().string();
-
                         Log.i("FROM /account/yzm/ ",info);
                         Gson gson = new Gson();
-                        Captcha captchaInfo = gson.fromJson(info,Captcha.class);
+                        Captcha captchaInfo = gson.fromJson(info, Captcha.class);
                         String captchaDir = captchaInfo.getYzm_url();
                         String cookie = captchaInfo.getYzm_cookie();
-
-                        //将cookie值传入sp中
-                        SharedPreferences cookieSp = getSharedPreferences("cookie",MODE_PRIVATE);
-                        SharedPreferences.Editor editor = cookieSp.edit();
-                        editor.putString("cookie",cookie);
-                        editor.commit();
-
+                        saveCookie(cookie);
                         getCaptchaImg(mainUrl+"/account"+captchaDir);   //更新验证码图片
-
-
                     }
                 }catch (IOException e) {
                     e.printStackTrace();
@@ -300,6 +366,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
 
+    }
+
+    private void saveCookie(String cookie) {
+        //将cookie值传入sp中
+        SharedPreferences cookieSp = getSharedPreferences("cookie",MODE_PRIVATE);
+        SharedPreferences.Editor editor = cookieSp.edit();
+        editor.putString("cookie",cookie);
+        editor.commit();
     }
 
     //设置登录图片
@@ -315,25 +389,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.i("getCaptchaImg","Failed...");
-                //此处处理请求失败的业务逻辑
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                //我写的这个例子是请求一个图片
-                //response的body是图片的byte字节
                 byte[] bytes = response.body().bytes();
-                //response.body().close();
 
                 //把byte字节组装成图片
                 final Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
-                //回调是运行在非ui主线程，
-                //数据请求成功后，在主线程中更新
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //网络图片请求成功，更新到主线程的ImageView
                         ivCaptcha.setImageBitmap(bmp);
                     }
                 });

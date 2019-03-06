@@ -1,19 +1,10 @@
 package com.example.fang.model;
 
 import android.app.Application;
-import android.appwidget.AppWidgetProvider;
-import android.content.SharedPreferences;
-import android.support.v4.content.res.FontResourcesParserCompat;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.example.fang.activity.MainActivity;
 import com.example.fang.activity.R;
-import com.google.gson.JsonObject;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
+import com.example.fang.utils.MyJSONParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -78,7 +68,7 @@ public class Building {
             if (response.isSuccessful()){
                 String courseInfo = response.body().string();
                 Log.i("courselist:", courseInfo);
-                courseList = CourseParser.parseCourseListFromJson(courseInfo);
+                courseList = MyJSONParser.parseCourseList(courseInfo);
             }else {
                 Log.i("Fail","Cannot get from "+ courseListUrl);
             }

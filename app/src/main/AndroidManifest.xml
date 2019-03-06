@@ -45,7 +45,8 @@
             android:value="1DuIrf3lYEhP4tPiitveUIODQmU10ff4" />
 
 
-        <activity android:name="com.example.fang.activity.MainActivity">
+        <activity android:name="com.example.fang.activity.MainActivity"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
 
         </activity>
 

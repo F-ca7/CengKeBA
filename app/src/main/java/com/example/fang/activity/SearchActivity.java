@@ -4,8 +4,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -14,13 +12,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.fang.adapter.CourseAdapter;
 import com.example.fang.model.Course;
-import com.example.fang.model.CourseParser;
+import com.example.fang.utils.MyJSONParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -158,7 +155,7 @@ public class SearchActivity extends AppCompatActivity {
             if (response.isSuccessful()){
                 String courseInfo = response.body().string();
                 Log.i("courselist:", courseInfo);
-                courseList = CourseParser.parseCourseListFromJson(courseInfo);
+                courseList = MyJSONParser.parseCourseList(courseInfo);
             }else {
                 Log.i("Fail","Cannot get from "+ searchUrl);
             }
