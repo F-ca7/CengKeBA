@@ -1,5 +1,6 @@
 package com.example.fang.activity;
 
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -18,11 +19,14 @@ import android.widget.Toast;
 
 import com.example.fang.model.Course;
 import com.example.fang.utils.MyJSONParser;
+import com.example.fang.utils.SerializeUtils;
 import com.example.fang.utils.SharedPreferenceUtils;
 import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -47,19 +51,15 @@ public class CourseActivity extends AppCompatActivity {
     private OkHttpClient okHttpClient = new OkHttpClient();
     private String mainUrl;
     private ArrayList<Course> courseList;
+
+
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         // 从savedInstanceState中恢复数据, 如果没有数据需要恢复savedInstanceState为null
 
         setContentView(R.layout.activity_course_table);
         initView();
-        if (savedInstanceState != null) {
-            toastDebug("正在恢复");
-            courseList = (ArrayList<Course>) savedInstanceState.getSerializable("courses");
-            for (Course course:courseList){
-                addCourseView(course);
-            }
-        }
+
         btnAddCourse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,6 +88,7 @@ public class CourseActivity extends AppCompatActivity {
                 try{
                     Log.i("课程表", result);
                     courseList = MyJSONParser.parseCourseList(result);
+                    saveCourseList(courseList);     //每次更新保存课程表
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -101,8 +102,22 @@ public class CourseActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
-
+    //保存课程表到文件中
+    private void saveCourseList(ArrayList<Course> courseList) {
+        SharedPreferences sp = getSharedPreferences("userInfo",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        Set<String> stringSet = new HashSet<>();
+        try {
+            for(Course course: courseList){
+                stringSet.add(SerializeUtils.serialize(course));
+            }
+            editor.putStringSet("course_list", stringSet);
+            editor.apply();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -110,7 +125,8 @@ public class CourseActivity extends AppCompatActivity {
         mainUrl = getString(R.string.base_url);
         courseList = new ArrayList<>();
         btnAddCourse=findViewById(R.id.btn_add_course);
-        //loadCourseData();
+        //加载之前保存的课程表
+        loadCourseData();
     }
 
     //update database from server
@@ -139,23 +155,36 @@ public class CourseActivity extends AppCompatActivity {
 
     //load course data from local database
     private void loadCourseData(){
-        ArrayList<Course> courseList = new ArrayList<>(); //课程列表
-        SQLiteDatabase sqLiteDatabase =  databaseHelper.getWritableDatabase();
-        Cursor cursor = sqLiteDatabase.rawQuery("select * from course", null);
-        if (cursor.moveToFirst()) {
-
+        SharedPreferences sp = getSharedPreferences("userInfo",MODE_PRIVATE);
+        Set<String> stringSet = sp.getStringSet("course_list", null);
+        if(stringSet==null)
+            return;
+        try {
+            for (String courseData: stringSet) {
+                courseList.add((Course) SerializeUtils.serializeToObject(courseData));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-        cursor.close();
-        //load the course table via the course info from the local database
         for (Course course : courseList) {
             addCourseView(course);
         }
+//        SQLiteDatabase sqLiteDatabase =  databaseHelper.getWritableDatabase();
+//        Cursor cursor = sqLiteDatabase.rawQuery("select * from course", null);
+//        if (cursor.moveToFirst()) {
+//
+//        }
+//        cursor.close();
+        //load the course table via the course info from the local database
+
     }
 
     private void addCourseView(final Course course){
         final int height = dp2px(61, this.getApplicationContext());
         int weekday = course.getDay_in_week();
-        toastDebug("正在添加课程:"+course.getName()+"@weekday"+weekday);
+        //toastDebug("正在添加课程:"+course.getName()+"@weekday"+weekday);
         LinearLayout day;
         switch (weekday){
             case 1: day = findViewById(R.id.mon_panel); break;
@@ -260,15 +289,6 @@ public class CourseActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
-
-
-    // 将数据保存到outState对象中, 该对象会在重建activity时传递给onCreate方法
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable("courses", courseList);
-        toastDebug("正在保存中...");
-    }
 
     @Override
     protected void onPause() {

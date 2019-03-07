@@ -39,6 +39,30 @@ public class Course implements Serializable {
         this.room = room;
     }
 
+    @Override
+    public String toString() {
+        return "Course{" +
+                "data_id='" + data_id + '\'' +
+                ", course_id='" + course_id + '\'' +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", school='" + school + '\'' +
+                ", major='" + major + '\'' +
+                ", teacher='" + teacher + '\'' +
+                ", credit=" + credit +
+                ", start_week=" + start_week +
+                ", end_week=" + end_week +
+                ", gap=" + gap +
+                ", day_in_week=" + day_in_week +
+                ", start_time=" + start_time +
+                ", end_time=" + end_time +
+                ", area='" + area + '\'' +
+                ", building='" + building + '\'' +
+                ", room='" + room + '\'' +
+                ", weight=" + weight +
+                '}';
+    }
+
     /**
      * data_id : 201720053411
      * course_id : 20172005341
@@ -243,7 +267,6 @@ public class Course implements Serializable {
         String time = getWeekDay()+" "+getStart_time()+"-"+getEnd_time()+"节";
         return time;
     }
-
 
 }
 
