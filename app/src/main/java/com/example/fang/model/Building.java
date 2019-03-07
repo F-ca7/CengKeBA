@@ -7,7 +7,10 @@ import com.example.fang.activity.R;
 import com.example.fang.utils.MyJSONParser;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,7 +32,10 @@ public class Building {
         this.area = area;
         this.building = building;
         this.application = application;
-        okHttpClient = new OkHttpClient();
+        okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(3,TimeUnit.SECONDS).build();
+
     }
 
     public String getBuildingName(){
@@ -74,7 +80,16 @@ public class Building {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            //判断超时异常
+            if(e instanceof SocketTimeoutException){
+
+            }
+            //判断连接异常
+            if(e instanceof ConnectException){
+                Log.i("请求", "连接异常");
+            }
         }
+
         return courseList;
     }
 

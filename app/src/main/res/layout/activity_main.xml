@@ -87,7 +87,7 @@
                 android:layout_marginLeft="15dp"
                 android:ems="10"
                 android:hint="请输入密码"
-                android:inputType="numberPassword"
+                android:inputType="textPassword"
                 android:singleLine="true" />
         </LinearLayout>
 

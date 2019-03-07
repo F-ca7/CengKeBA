@@ -28,10 +28,6 @@ import com.example.fang.model.LoginInfo;
 import com.example.fang.model.LoginStatusEnum;
 import com.example.fang.utils.MyJSONParser;
 import com.example.fang.utils.SecuritySharedPreference;
-import com.github.johnpersano.supertoasts.library.Style;
-import com.github.johnpersano.supertoasts.library.SuperActivityToast;
-import com.github.johnpersano.supertoasts.library.SuperToast;
-import com.github.johnpersano.supertoasts.library.utils.PaletteUtils;
 import com.google.gson.Gson;
 //import com.muddzdev.styleabletoast.StyleableToast;
 
@@ -76,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public boolean handleMessage(Message message) {
             LoginInfo info = (LoginInfo)message.obj;
             LoginStatusEnum status = info.getStatus();
-
 
             switch (status){
                 case SUCCESS:
@@ -263,12 +258,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     String name = job.getString("real_name");
                     String token = job.getString("token");
                     info = new LoginInfo(name, userID, token, code);
+                    //是否要记住密码
                     if(ckbRememberPwd.isChecked()){
                         storeLoginInfo(info, password);
                     }else {
                         clearRemember();
                     }
-
                     break;
                 case WRONG_PWD:
                 case UNKNOWN:
@@ -413,8 +408,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //激活用户
     private void activateAccount(){
         final String activateUrl =mainUrl+"/account/activate/";
-        String username = etUsername.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
+        final String username = etUsername.getText().toString().trim();
+        final String password = etPassword.getText().toString().trim();
         String yzm_text = tvYzm.getText().toString().trim();
         SharedPreferences cookieSp = getSharedPreferences("cookie",MODE_PRIVATE);
         String yzm_cookie =cookieSp.getString("cookie","");
@@ -438,20 +433,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.i("FROM /account/yzm/ ",info);
                 Gson gson = new Gson();
                 ActivatedUser activatedUser = gson.fromJson(info,ActivatedUser.class);
-                updateUserInfo(activatedUser);
+                loginAccount(username, password);
             }
         });
-    }
-
-    private void updateUserInfo(ActivatedUser user){
-        String activatedUsername = user.getUsername();
-        List<String> activatedUserTerm = user.getTerm();
-        SharedPreferences userInfo = getSharedPreferences("userInfo",MODE_PRIVATE);
-        SharedPreferences.Editor editor = userInfo.edit();
-        editor.putString("username",activatedUsername);
-        editor.putString("term-year",activatedUserTerm.get(0));
-        editor.putString("term-week",activatedUserTerm.get(1));
-        editor.apply();
     }
 
 }

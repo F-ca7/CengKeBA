@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
@@ -71,8 +72,8 @@ import permissions.dispatcher.RuntimePermissions;
 
 import com.example.fang.utils.AppUtils;
 import com.github.ybq.android.spinkit.style.Circle;
-import com.github.ybq.android.spinkit.style.DoubleBounce;
-import com.wang.avi.AVLoadingIndicatorView;
+
+
 
 import static com.example.fang.utils.AppUtils.toastDebug;
 
@@ -115,8 +116,12 @@ public class MainInterActivity extends AppCompatActivity {
     //教学楼用的经纬度
     final private LatLng GREEN_HOUSE_1_LL = new LatLng(30.532767204603044,114.36761327108664);
     final private LatLng GREEN_HOUSE_2_LL = new LatLng(30.532759428029625,114.36883496658021);
+    final private LatLng GREEN_HOUSE_5_LL = new LatLng(30.53209064036299,114.36645445697877);
+    final private LatLng WENLI_HOUSE_1_LL = new LatLng(30.543428295336547,114.37177242559784);
     final private LatLng WENLI_HOUSE_3_LL = new LatLng(30.54573765374643,114.36659818586037);
     final private LatLng WENLI_HOUSE_5_LL = new LatLng(30.542448550765936,114.36783784746414);
+    final private LatLng WENLI_HOUSE_4_LL = new LatLng(30.543171696533136,114.36825106799873);
+    final private LatLng GONG_HOUSE_11_LL = new LatLng(30.546950627859676,114.36727191499286);
     private HashMap<LatLng, Building> ll_building_map = new HashMap<>();
 
     private MyLocationListener myListener = new MyLocationListener();
@@ -251,7 +256,6 @@ public class MainInterActivity extends AppCompatActivity {
                 .setMessage(messageResId)
                 .show();
     }
-
 
     //make userCenterBtn-center button floating
     private void setFloatingButton() {
@@ -390,6 +394,7 @@ public class MainInterActivity extends AppCompatActivity {
 
     }
 
+
     //Configure Baidu map
     private void setMap(){
         mapView.showScaleControl(false);
@@ -418,7 +423,7 @@ public class MainInterActivity extends AppCompatActivity {
                     hideCourseList();
                 }
                 String text = String.format("经纬度为%f,%f",latLng.latitude,latLng.longitude);
-                Toast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(),text, Toast.LENGTH_LONG).show();
                 Log.i("经纬度记录",text);
             }
 
@@ -438,10 +443,15 @@ public class MainInterActivity extends AppCompatActivity {
         CoordinateConverter converter  = new CoordinateConverter();
         converter.from(CoordinateConverter.CoordType.COMMON);
 
-        ll_building_map.put(GREEN_HOUSE_1_LL,new Building("3","1", getApplication()));
-        ll_building_map.put(GREEN_HOUSE_2_LL,new Building("3","2", getApplication()));
-        ll_building_map.put(WENLI_HOUSE_3_LL,new Building("1","3", getApplication()));
-        ll_building_map.put(WENLI_HOUSE_5_LL,new Building("1","5", getApplication()));
+        ll_building_map.put(GREEN_HOUSE_1_LL, new Building("3","1", getApplication()));
+        ll_building_map.put(GREEN_HOUSE_2_LL, new Building("3","2", getApplication()));
+        ll_building_map.put(GREEN_HOUSE_5_LL, new Building("3","5", getApplication()));
+        ll_building_map.put(WENLI_HOUSE_1_LL, new Building("1","1", getApplication()));
+        ll_building_map.put(WENLI_HOUSE_3_LL, new Building("1","3", getApplication()));
+        ll_building_map.put(WENLI_HOUSE_4_LL, new Building("1","4", getApplication()));
+        ll_building_map.put(WENLI_HOUSE_5_LL, new Building("1","5", getApplication()));
+        ll_building_map.put(GONG_HOUSE_11_LL, new Building("2","11", getApplication()));
+
     }
 
     //添加教学楼的marker
@@ -452,60 +462,65 @@ public class MainInterActivity extends AppCompatActivity {
         }
         baiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
             @Override
-            public boolean onMarkerClick(Marker marker) {
-            if(!isShowingCourse) {
+            public boolean onMarkerClick(final Marker marker) {
                 progressBar.setVisibility(View.VISIBLE);
                 String buildingName = marker.getTitle();
                 LatLng buildingLL = marker.getPosition();
-                /*Toast.makeText(getApplicationContext(),
-                        buildingName + "获取中...@" + buildingLL.latitude + "," + buildingLL.longitude,
-                        Toast.LENGTH_SHORT).show();*/
+
                 Log.i("marker:", marker.getTitle() + "获取中...@" + marker.getPosition().latitude + "," + marker.getPosition().longitude);
                 isShowingCourse = true;
                 final Building building = ll_building_map.get(buildingLL);
-
                 new Thread(new Runnable(){
                     @Override
                     public void run() {
                         courseList = building.getCourseListInBuilding();
                         if(courseList.isEmpty()){
-                            toastDebug(getApplicationContext(),"该教学楼课程列表为空");
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    toastDebug(getApplicationContext(),"该教学楼课程列表为空");
+                                    progressBar.setVisibility(View.GONE);
+
+                                }
+                            });
+
                         }else {
                             showCourseList();
                         }
                     }
                 }).start();
-            }else {
-                hideCourseList();
-                showCourseList();
-            }
-            return false;
+                return false;
             }
         });
     }
 
 
     private void showCourseList() {
+        if(isShowingCourse){
+            hideCourseList();
+        }
+        isShowingCourse = true;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 progressBar.setVisibility(View.GONE);
+                CourseAdapter courseAdapter = new CourseAdapter(MainInterActivity.this, R.layout.item_course, courseList);
+                lvBuildingCourseList.setAdapter(courseAdapter);
+                //当指向另一个ArrayList时，就不能这样做
+                //courseAdapter.notifyDataSetChanged();
+                final TranslateAnimation ctrlAnimation = new TranslateAnimation(TranslateAnimation.RELATIVE_TO_SELF, 0, TranslateAnimation.RELATIVE_TO_SELF, 0,
+                        TranslateAnimation.RELATIVE_TO_SELF, 1, TranslateAnimation.RELATIVE_TO_SELF, 0);
+                ctrlAnimation.setDuration(600L);     //设置动画的过渡时间
+                llBuildingCourseList.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        llBuildingCourseList.setVisibility(View.VISIBLE);
+                        llBuildingCourseList.startAnimation(ctrlAnimation);
+                    }
+                }, 200);
             }
         });
-        CourseAdapter courseAdapter = new CourseAdapter(MainInterActivity.this,R.layout.item_course,courseList);
-        lvBuildingCourseList.setAdapter(courseAdapter);
-        //当指向另一个ArrayList时，就不能这样做
-        //courseAdapter.notifyDataSetChanged();
-        final TranslateAnimation ctrlAnimation = new TranslateAnimation(TranslateAnimation.RELATIVE_TO_SELF, 0, TranslateAnimation.RELATIVE_TO_SELF, 0,
-                TranslateAnimation.RELATIVE_TO_SELF, 1, TranslateAnimation.RELATIVE_TO_SELF, 0);
-        ctrlAnimation.setDuration(600L);     //设置动画的过渡时间
-        llBuildingCourseList.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                llBuildingCourseList.setVisibility(View.VISIBLE);
-                llBuildingCourseList.startAnimation(ctrlAnimation);
-            }
-        }, 200);
+
     }
 
     private void hideCourseList() {
@@ -526,7 +541,7 @@ public class MainInterActivity extends AppCompatActivity {
 
     //添加自定义marker
     private void addMarker(LatLng latLng, BitmapDescriptor bitmap, String title){
-        OverlayOptions option = new MarkerOptions().position(latLng).icon(bitmap).title(title).perspective(true).draggable(true);
+        OverlayOptions option = new MarkerOptions().position(latLng).icon(bitmap).title(title).perspective(true).draggable(false);
         baiduMap.addOverlay(option);
     }
 

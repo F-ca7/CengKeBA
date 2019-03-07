@@ -101,6 +101,7 @@ public class UserCenterActivity extends AppCompatActivity implements View.OnClic
     private void userLogout() {
         final String logoutUrl = mainUrl + "/account/logout/";
         String token =  sp.getString("token","");
+
         RequestBody requestBody = new FormBody.Builder()
                 .add("token", token).build();
         Request request = (new Request.Builder().url(logoutUrl)).post(requestBody).build();
@@ -117,6 +118,14 @@ public class UserCenterActivity extends AppCompatActivity implements View.OnClic
                 Log.i("登出", loginResult);
             }
         });
+        clearUserdata();
+
+        Intent logoutIntent = new Intent(UserCenterActivity.this, MainActivity.class);
+        logoutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(logoutIntent);
+    }
+
+    private void clearUserdata() {
         SharedPreferences.Editor editor = sp.edit();
         editor.clear();
         editor.apply();
@@ -124,9 +133,6 @@ public class UserCenterActivity extends AppCompatActivity implements View.OnClic
         settingEditor.putBoolean("is_save_pwd",false);
         settingEditor.remove("password");
         settingEditor.apply();
-        Intent logoutIntent = new Intent(UserCenterActivity.this, MainActivity.class);
-        logoutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(logoutIntent);
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

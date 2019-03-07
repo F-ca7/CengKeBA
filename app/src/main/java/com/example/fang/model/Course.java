@@ -24,7 +24,8 @@ public class Course implements Serializable {
         this.room = room;
     }
 
-    public Course(String name, String teacher, int start_week, int end_week, int gap,int day_in_week, int start_time, int end_time, String area, String building, String room) {
+    public Course(String data_id,String name, String teacher, int start_week, int end_week, int gap,int day_in_week, int start_time, int end_time, String area, String building, String room) {
+        this.data_id = data_id;
         this.name = name;
         this.teacher = teacher;
         this.start_week = start_week;
@@ -59,8 +60,8 @@ public class Course implements Serializable {
      * weight : 0.0
      */
 
-    private long data_id;
-    private long course_id;
+    private String data_id;
+    private String course_id;
     private String name;
     private String type;
     private String school;
@@ -79,19 +80,19 @@ public class Course implements Serializable {
     private double weight;
 
 
-    public long getData_id() {
+    public String getData_id() {
         return data_id;
     }
 
-    public void setData_id(long data_id) {
+    public void setData_id(String data_id) {
         this.data_id = data_id;
     }
 
-    public long getCourse_id() {
+    public String getCourse_id() {
         return course_id;
     }
 
-    public void setCourse_id(long course_id) {
+    public void setCourse_id(String course_id) {
         this.course_id = course_id;
     }
 
@@ -230,8 +231,8 @@ public class Course implements Serializable {
     //return the Chinese of a certain weekday
     public String getWeekDay(){
         String[] weekday={"周一","周二","周三","周四","周五","周六","周日"};
-        if(day_in_week>-1 && day_in_week<7){
-            return  weekday[day_in_week];
+        if(day_in_week>0 && day_in_week<=7){
+            return  weekday[day_in_week-1];
         }else {
             return "未知周数";
         }

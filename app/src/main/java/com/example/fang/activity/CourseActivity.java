@@ -1,6 +1,5 @@
 package com.example.fang.activity;
 
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -18,8 +17,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fang.model.Course;
+import com.example.fang.utils.MyJSONParser;
+import com.example.fang.utils.SharedPreferenceUtils;
+import com.google.gson.JsonSyntaxException;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import static com.example.fang.utils.PxDpUtils.dp2px;
 
@@ -35,25 +44,71 @@ public class CourseActivity extends AppCompatActivity {
     //SQLite Helper类
     private DatabaseHelper databaseHelper = new DatabaseHelper
             (this, "cengkeba_database.db", null, 1);
-
+    private OkHttpClient okHttpClient = new OkHttpClient();
+    private String mainUrl;
+    private ArrayList<Course> courseList;
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        // 从savedInstanceState中恢复数据, 如果没有数据需要恢复savedInstanceState为null
+
         setContentView(R.layout.activity_course_table);
         initView();
+        if (savedInstanceState != null) {
+            toastDebug("正在恢复");
+            courseList = (ArrayList<Course>) savedInstanceState.getSerializable("courses");
+            for (Course course:courseList){
+                addCourseView(course);
+            }
+        }
         btnAddCourse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //toastDebug("点击添加课程");
-                addCourseView(new Course("高等数学","稳哥",1,17,0,3,3,5,
-                        "3","1","201"));
-                addCourseView(new Course("线性代数","不稳哥",1,17,0,5,7,8,
-                        "2","2","301"));
+                loadUserCourse();
             }
         });
     }
 
-    private void initView(){
+    private void loadUserCourse() {
+        final String courseTableUrl = mainUrl +"/course/course_table/" + SharedPreferenceUtils.getCurrentToken(getApplicationContext());
 
+        Request request = new Request.Builder()
+                .url(courseTableUrl).get().build();
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.i("Fail","Cannot get from "+ courseTableUrl);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String result = response.body().string();
+                try{
+                    Log.i("课程表", result);
+                    courseList = MyJSONParser.parseCourseList(result);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (Course course:courseList){
+                                addCourseView(course);
+                            }
+                        }
+                    });
+                }catch (JsonSyntaxException e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+
+    }
+
+    private void initView(){
+        mainUrl = getString(R.string.base_url);
+        courseList = new ArrayList<>();
         btnAddCourse=findViewById(R.id.btn_add_course);
         //loadCourseData();
     }
@@ -79,10 +134,6 @@ public class CourseActivity extends AppCompatActivity {
 
     private ArrayList<Course> getNewCourseListFromServer() {
         ArrayList<Course> courseList = new ArrayList<>(); //课程列表
-        courseList.add(new Course("高等数学","稳哥",1,17,0,3,3,5,
-                "3区","1教","201"));
-        courseList.add(new Course("线性代数","不稳哥",1,17,0,5,7,8,
-                "2区","2教","301"));
         return courseList;
     }
 
@@ -92,20 +143,7 @@ public class CourseActivity extends AppCompatActivity {
         SQLiteDatabase sqLiteDatabase =  databaseHelper.getWritableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("select * from course", null);
         if (cursor.moveToFirst()) {
-            do {
-                courseList.add(new Course(
-                        cursor.getString(cursor.getColumnIndex("name")),
-                        cursor.getString(cursor.getColumnIndex("teacher")),
-                        cursor.getInt(cursor.getColumnIndex("start_week")),
-                        cursor.getInt(cursor.getColumnIndex("end_week")),
-                        cursor.getInt(cursor.getColumnIndex("gap")),
-                        cursor.getInt(cursor.getColumnIndex("day_in_week")),
-                        cursor.getInt(cursor.getColumnIndex("start_time")),
-                        cursor.getInt(cursor.getColumnIndex("end_time")),
-                        cursor.getString(cursor.getColumnIndex("area")),
-                        cursor.getString(cursor.getColumnIndex("building")),
-                        cursor.getString(cursor.getColumnIndex("room"))));
-            } while(cursor.moveToNext());
+
         }
         cursor.close();
         //load the course table via the course info from the local database
@@ -115,8 +153,7 @@ public class CourseActivity extends AppCompatActivity {
     }
 
     private void addCourseView(final Course course){
-        final int height = dp2px(61,this.getApplicationContext());
-
+        final int height = dp2px(61, this.getApplicationContext());
         int weekday = course.getDay_in_week();
         toastDebug("正在添加课程:"+course.getName()+"@weekday"+weekday);
         LinearLayout day;
@@ -225,7 +262,22 @@ public class CourseActivity extends AppCompatActivity {
 
 
 
+    // 将数据保存到outState对象中, 该对象会在重建activity时传递给onCreate方法
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("courses", courseList);
+        toastDebug("正在保存中...");
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
 
+    }
+    @Override
+    protected void onRestart() {
+        super.onRestart();
 
+    }
 }

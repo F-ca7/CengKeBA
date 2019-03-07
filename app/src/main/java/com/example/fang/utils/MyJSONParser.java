@@ -1,11 +1,14 @@
 package com.example.fang.utils;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.example.fang.model.Course;
 import com.example.fang.model.LoginStatusEnum;
+import com.example.fang.model.TakeCourseEnum;
 
 import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
@@ -48,7 +51,7 @@ public class MyJSONParser {
 
         for(int i =0; i<count; i++){
             job = jsonArray.getJSONObject(i);
-            courseList.add(new Course(job.getString("name"), job.getString("teacher"),
+            courseList.add(new Course(job.getString("data_id"),job.getString("name"), job.getString("teacher"),
                     job.getInt("start_week"), job.getInt("end_week"), job.getInt("gap"),
                     job.getInt("day_in_week"), job.getInt("start_time"), job.getInt("end_time"),
                     job.getString("area"), job.getString("building"), job.getString("room")));
@@ -83,5 +86,39 @@ public class MyJSONParser {
         }
         //都不匹配，未知错误
         return LoginStatusEnum.UNKNOWN;
+    }
+
+    public static TakeCourseEnum parseTakingCourse(String data){
+        try {
+            JSONObject job = JSONObject.fromObject(data);
+            if(job.has("message")){
+                String message = job.getString("message");
+                switch (message){
+                    case "done":
+                        return TakeCourseEnum.SUCCESS;
+                }
+            }
+            return TakeCourseEnum.FAILED;
+        }catch (JSONException e){
+            e.printStackTrace();
+            return TakeCourseEnum.FAILED;
+        }
+    }
+
+    public static TakeCourseEnum parseCollectingCourse(String data){
+        try {
+            JSONObject job = JSONObject.fromObject(data);
+            if(job.has("message")){
+                String message = job.getString("message");
+                switch (message){
+                    case "done":
+                        return TakeCourseEnum.SUCCESS;
+                }
+            }
+            return TakeCourseEnum.FAILED;
+        }catch (JSONException e){
+            e.printStackTrace();
+            return TakeCourseEnum.FAILED;
+        }
     }
 }

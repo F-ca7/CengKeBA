@@ -51,18 +51,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void initCourseList() {
-        courseList.add(new Course("高等数学","稳哥",1,17,0,3,3,5,
-                "3","1","201"));
-        courseList.add(new Course("线性代数","不稳哥",1,17,0,5,7,8,
-                "2","2","301"));
-        courseList.add(new Course("C++","刚哥",1,17,0,5,7,8,
-                "2","国软","201"));
-        courseList.add(new Course("大学英语3","孙志勇",1,17,0,5,7,8,
-                "2","2","501"));
-        courseList.add(new Course("大学英语4","孙志勇",2,17,0,5,7,8,
-                "3","2","301"));
-        courseList.add(new Course("Java","桂老板",2,17,0,5,7,8,
-                "3","2","305"));
+
     }
 
     private void initView() {
@@ -135,7 +124,7 @@ public class SearchActivity extends AppCompatActivity {
         if(searchResultList.isEmpty()){
             Toast.makeText(SearchActivity.this,"无查询结果", Toast.LENGTH_SHORT).show();
         }
-        CourseAdapter courseAdapter = new CourseAdapter(SearchActivity.this,R.layout.item_course,courseList);
+        CourseAdapter courseAdapter = new CourseAdapter(SearchActivity.this,R.layout.item_course, searchResultList);
         searchListView.setAdapter(courseAdapter);
     }
 
@@ -155,7 +144,7 @@ public class SearchActivity extends AppCompatActivity {
             if (response.isSuccessful()){
                 String courseInfo = response.body().string();
                 Log.i("courselist:", courseInfo);
-                courseList = MyJSONParser.parseCourseList(courseInfo);
+                searchResultList = MyJSONParser.parseCourseList(courseInfo);
             }else {
                 Log.i("Fail","Cannot get from "+ searchUrl);
             }
