@@ -16,5 +16,14 @@
     <string name="time_12">19:20\n\n\n20:05</string>
     <string name="time_13">20:10\n\n\n20:55</string>
 
+    <string name="sp_user_token">token</string>
+    <string name="sp_user_name">real_name</string>
+    <string name="sp_user_id">stu_ID</string>
+
+    <string name="sp_settings_pwd">password</string>
+    <string name="sp_settings_is_save_pwd">is_save_pwd</string>
+
+    <string name="about_extra">一言难尽。。。</string>
+    <string name="about_description">致敬超级课程表</string>
     <string name="base_url">http://47.106.107.107</string>
 </resources>

@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,9 +36,10 @@ public class UserCenterActivity extends AppCompatActivity implements View.OnClic
     private Button btnStudyRoom;
     private Button btnLogout;
     private TextView username;
-    private SharedPreferences sp;
+    private SharedPreferences spUser;
     private ImageView photo;
     private String mainUrl;
+    private Toast toast;
     private OkHttpClient okHttpClient;
 
     @Override
@@ -60,9 +60,11 @@ public class UserCenterActivity extends AppCompatActivity implements View.OnClic
         btnStudyRoom = findViewById(R.id.study_room);
         btnLogout = findViewById(R.id.logout);
         photo = findViewById(R.id.photo);
-        sp = getSharedPreferences("userInfo",MODE_PRIVATE);
+        toast = new Toast(this);
 
-        String name = sp.getString("real_name","");
+        spUser = getSharedPreferences("userInfo",MODE_PRIVATE);
+
+        String name = spUser.getString("real_name","");
         username.setText(name);
 
         photo.setOnClickListener(this);
@@ -90,7 +92,8 @@ public class UserCenterActivity extends AppCompatActivity implements View.OnClic
             case R.id.course_recommend:
             case R.id.course_history:
             case R.id.study_room:
-                Toast.makeText(getApplicationContext(),"即将开发",Toast.LENGTH_SHORT).show();
+                toast.setText("即将开发");
+                toast.show();
                 break;
             case R.id.logout:
                 userLogout();
@@ -100,7 +103,7 @@ public class UserCenterActivity extends AppCompatActivity implements View.OnClic
 
     private void userLogout() {
         final String logoutUrl = mainUrl + "/account/logout/";
-        String token =  sp.getString("token","");
+        String token =  spUser.getString(getString(R.string.sp_user_token),"");
 
         RequestBody requestBody = new FormBody.Builder()
                 .add("token", token).build();
@@ -126,12 +129,13 @@ public class UserCenterActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void clearUserdata() {
-        SharedPreferences.Editor editor = sp.edit();
+        SharedPreferences.Editor editor = spUser.edit();
         editor.clear();
         editor.apply();
         SharedPreferences.Editor settingEditor = getSharedPreferences("settings",MODE_PRIVATE).edit();
-        settingEditor.putBoolean("is_save_pwd",false);
-        settingEditor.remove("password");
+        //不保存密码
+        settingEditor.putBoolean(getString(R.string.sp_settings_is_save_pwd),false);
+        settingEditor.remove(getString(R.string.sp_settings_pwd));
         settingEditor.apply();
     }
 

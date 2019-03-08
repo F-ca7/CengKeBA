@@ -156,7 +156,7 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == android.R.id.home){
-            Log.i(TAG,"back");
+            //Log.i(TAG,"back");
             //Toast.makeText(this,"back", Toast.LENGTH_SHORT).show();
             finish();
         }

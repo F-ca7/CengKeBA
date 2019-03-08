@@ -19,9 +19,6 @@ import com.example.fang.utils.SecuritySharedPreference;
 public class WelcomeActivity extends AppCompatActivity {
     private final long DELAY = 1500;
     Handler handler = new Handler();
-    private SecuritySharedPreference ssp;
-    private String temp_username;
-    private String temp_password;
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -30,23 +27,16 @@ public class WelcomeActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);  //全屏
         setContentView(R.layout.activity_welcome);
 
-        ssp = new SecuritySharedPreference(getApplicationContext(),"userInfo",MODE_PRIVATE);
-        temp_username = ssp.getString("USERNAME","");
-        temp_password = ssp.getString("PASSWORD","");
-
-
-
-
-        SharedPreferences sp = getSharedPreferences("record",MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences("settings",MODE_PRIVATE);
 //      此处如果key "isFirstRun"对应的value没有值则默认为true，
         boolean isFirstRun = sp.getBoolean("isFirstRun",true);
         if(isFirstRun){
 //            不要忘记commit提交
             sp.edit().putBoolean("isFirstRun",false).commit();
-            Log.i("welcome界面","正在跳转Guide");
+            //Log.i("welcome界面","正在跳转Guide");
             toGuide();
         }else {
-            Log.i("welcome界面","正在跳转Login");
+            //Log.i("welcome界面","正在跳转Login");
             toLogin();
         }
 

@@ -284,9 +284,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void storeLoginInfo(LoginInfo info, String password) {
         SharedPreferences userInfo = getSharedPreferences("userInfo",MODE_PRIVATE);
         SharedPreferences.Editor editor = userInfo.edit();
-        editor.putString("real_name", info.getName());
-        editor.putString("stu_ID", info.getId());
-        editor.putString("token", info.getToken());
+        editor.putString(getString(R.string.sp_user_name), info.getName());
+        editor.putString(getString(R.string.sp_user_id), info.getId());
+        editor.putString(getString(R.string.sp_user_token), info.getToken());
         editor.apply();
         if(ckbRememberPwd.isChecked()){
             rememberPwd(password);
@@ -303,16 +303,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void clearRemember() {
         SecuritySharedPreference.Editor editor = ssp.edit();
-        editor.putString("password", "");
-        editor.putBoolean("is_save_pwd",false);
+        editor.putString(getString(R.string.sp_settings_pwd), "");
+        editor.putBoolean(getString(R.string.sp_settings_is_save_pwd),false);
         editor.apply();
     }
 
     private void rememberPwd(String pwd) {
-        SecuritySharedPreference ssp = new SecuritySharedPreference(getApplicationContext(), "settings",MODE_PRIVATE);
         SecuritySharedPreference.Editor editor = ssp.edit();
-        editor.putString("password", pwd);
-        editor.putBoolean("is_save_pwd",true);
+        editor.putString(getString(R.string.sp_settings_pwd), pwd);
+        editor.putBoolean(getString(R.string.sp_settings_is_save_pwd),true);
         editor.apply();
     }
 
@@ -431,8 +430,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onResponse(Call call, Response response) throws IOException {
                 String info = response.body().string();
                 Log.i("FROM /account/yzm/ ",info);
-                Gson gson = new Gson();
-                ActivatedUser activatedUser = gson.fromJson(info,ActivatedUser.class);
+                /*todo 激活成功判断*/
                 loginAccount(username, password);
             }
         });

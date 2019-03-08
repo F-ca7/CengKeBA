@@ -16,7 +16,7 @@ import java.sql.Time;
 public class AboutUsActivity extends AppCompatActivity {
     private ImageView ivAboutUs;
     private final int CLICK_COUNT = 5;  //连续点击次数
-    private final int TIME_SPAN = 1000;  //在1000ms以内
+    private final int CLICK_TIME_SPAN = 1000;  //在1000ms以内
     private long[] mHits = new long[CLICK_COUNT];
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -32,11 +32,10 @@ public class AboutUsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //每点击一次 实现左移一格数据
                 System.arraycopy(mHits, 1, mHits, 0, mHits.length - 1);
-                //给数组的最后赋当前时钟值
                 mHits[mHits.length - 1] = SystemClock.uptimeMillis();
                 //当0处的值大于当前时间-1000时  证明在1000秒内点击了5次
-                if (mHits[0] > SystemClock.uptimeMillis() - TIME_SPAN) {
-                    Toast.makeText(getApplicationContext(), "一言难尽。。。", Toast.LENGTH_SHORT).show();
+                if (mHits[0] > SystemClock.uptimeMillis() - CLICK_TIME_SPAN) {
+                    Toast.makeText(getApplicationContext(), getString(R.string.about_extra), Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -46,8 +46,7 @@ import static com.example.fang.utils.PxDpUtils.dp2px;
 public class CourseActivity extends AppCompatActivity {
     private Button btnAddCourse;
     //SQLite Helper类
-    private DatabaseHelper databaseHelper = new DatabaseHelper
-            (this, "cengkeba_database.db", null, 1);
+    //private DatabaseHelper databaseHelper = new DatabaseHelper(this, "cengkeba_database.db", null, 1);
     private OkHttpClient okHttpClient = new OkHttpClient();
     private String mainUrl;
     private ArrayList<Course> courseList;
@@ -130,23 +129,22 @@ public class CourseActivity extends AppCompatActivity {
     }
 
     //update database from server
-    private void updateCourseData(){
-        ArrayList<Course> courseList = getNewCourseListFromServer();
-        if (courseList.isEmpty()){
-            Log.d("updating info:","获取课表为空");
-            return;
-        }
-        SQLiteDatabase sqLiteDatabase =  databaseHelper.getWritableDatabase();
-        //delete all entries in table 'course'
-        sqLiteDatabase.execSQL("delete from course;");
-        sqLiteDatabase.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'course';");
-        //save each course into the table
-        for (Course course : courseList) {
-            /*todo 插入的sql语句*/
-            sqLiteDatabase.execSQL("insert into course(name, teacher,start_week,end_week,gap,day_in_week,start_time,end_time" +
-                    "area,building,romm) values(?,?)",new Object[]{});
-        }
-    }
+//    private void updateCourseData(){
+//        ArrayList<Course> courseList = getNewCourseListFromServer();
+//        if (courseList.isEmpty()){
+//            Log.d("updating info:","获取课表为空");
+//            return;
+//        }
+//        SQLiteDatabase sqLiteDatabase =  databaseHelper.getWritableDatabase();
+//        //delete all entries in table 'course'
+//        sqLiteDatabase.execSQL("delete from course;");
+//        sqLiteDatabase.execSQL("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'course';");
+//        //save each course into the table
+//        for (Course course : courseList) {
+//            sqLiteDatabase.execSQL("insert into course(name, teacher,start_week,end_week,gap,day_in_week,start_time,end_time" +
+//                    "area,building,romm) values(?,?)",new Object[]{});
+//        }
+//    }
 
     private ArrayList<Course> getNewCourseListFromServer() {
         ArrayList<Course> courseList = new ArrayList<>(); //课程列表
@@ -178,7 +176,6 @@ public class CourseActivity extends AppCompatActivity {
 //        }
 //        cursor.close();
         //load the course table via the course info from the local database
-
     }
 
     private void addCourseView(final Course course){
